@@ -1,24 +1,38 @@
 import { View, Text, Pressable, Actionsheet, useDisclose } from "native-base"
 import { registrationPageStyles as Styles } from "./RegistrationPageStyles"
-import { SafeAreaView, ScrollView } from "react-native"
+import { Dimensions, SafeAreaView, ScrollView, Modal, TouchableOpacity } from "react-native"
 import Svg, { Path } from "react-native-svg"
 import React, { useEffect, useState } from "react"
 import { TextInput } from "react-native-gesture-handler"
 
+const validateData = (details: any) => {
+    if (details.name.length && details.emailId.length && details.password.length) {
+        return true
+    }
+    return false
+}
 
-
-export const RegistrationPage = () => {
-    const { isOpen, onOpen, onClose } = useDisclose();
+export const RegistrationPage = ({ navigation, route }) => {
     const [currentActive, setCurrentActive] = useState(true);
     const [details, setDetails] = useState({
         name: '',
         emailId: '',
         password: ''
-    })
+    });
+    const [modalVisible, setModalVisible] = useState(false);
+    const [formStatus, setFormStatus] = useState(false);
 
     useEffect(() => {
+        const isFormFilled = validateData(details)
+        setFormStatus(isFormFilled)
+    }, [details])
 
-    },[details])
+    useEffect(() => {
+        if(route.params?.data) {
+            setModalVisible(true);
+            setCurrentActive(false)
+        }
+    }, [route.params?.data])
 
     return (
         <SafeAreaView>
@@ -34,41 +48,53 @@ export const RegistrationPage = () => {
                     <Text>Before enjoying Foodmedia services</Text>
                     <Text>Please register first</Text>
                 </View>
-                <Pressable onPress={onOpen} style={Styles.createBtn}>
+                <Pressable onPress={() => {setCurrentActive(true), setModalVisible(true)}} style={Styles.createBtn}>
                     <Text style={Styles.accountText}>Create Account</Text>
                 </Pressable>
-                {
-                    isOpen ? (
-                        <Actionsheet isOpen={isOpen} onClose={onClose}>
-                            <Actionsheet.Content>
-                                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                    <View>
-                                        <Pressable onPress={() => setCurrentActive(!currentActive)}>
-                                            <Text>Create Account</Text>
-                                            {currentActive ? (
-                                                <View style={Styles.underLine}></View>
-                                            ) :
-                                                (
-                                                    <></>
-                                                )
-                                            }
-                                        </Pressable>
-                                    </View>
-                                    <View style={{ marginLeft: 20 }}>
-                                        <Pressable onPress={() => setCurrentActive(!currentActive)}>
-                                            <Text>Login</Text>
-                                            {!currentActive ? (
-                                                <View style={Styles.underLine}></View>
-                                            ) :
-                                                (
-                                                    <></>
-                                                )
-                                            }
-                                        </Pressable>
-                                    </View>
-                                </ScrollView>
-                                <View>
-                                    <View style={Styles.nameWrapper}>
+                <Modal animationType={"fade"}
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                        setModalVisible(false);
+                    }}
+                >
+                    <TouchableOpacity
+                        activeOpacity={1}
+                        style={Styles.container}
+                        onPressOut={() => setModalVisible(false)}
+                        >
+                    </TouchableOpacity>
+                    <View style={Styles.modalBottom}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginLeft: 20, width: '100%'}}>
+                            <View>
+                                <Pressable onPress={() => setCurrentActive(true)}>
+                                    <Text>Create Account</Text>
+                                    {currentActive ? (
+                                        <View style={Styles.underLine}></View>
+                                    ) :
+                                        (
+                                            <></>
+                                        )
+                                    }
+                                </Pressable>
+                            </View>
+                            <View style={{ marginLeft: 20 }}>
+                                <Pressable onPress={() => {setCurrentActive(false)}}>
+                                    <Text>Login</Text>
+                                    {!currentActive ? (
+                                        <View style={Styles.underLine}></View>
+                                    ) :
+                                        (
+                                            <></>
+                                        )
+                                    }
+                                </Pressable>
+                            </View>
+                        </ScrollView>
+                        <View style={{paddingBottom: 60}}>
+                            {
+                                currentActive ?
+                                    (<View style={Styles.nameWrapper}>
                                         <Text>Full Name</Text>
                                         <TextInput
                                             style={Styles.nameInput}
@@ -81,51 +107,56 @@ export const RegistrationPage = () => {
                                             }}
                                             placeholder="Enter name"
                                         />
-                                    </View>
+                                    </View>) :
+                                    (<></>)
+                            }
 
-                                    <View style={Styles.nameWrapper}>
-                                        <Text>Email address</Text>
-                                        <TextInput
-                                            style={Styles.nameInput}
-                                            value={details.emailId}
-                                            onChangeText={(val) => {
-                                                setDetails(prevState => ({
-                                                    ...prevState,
-                                                    emailId: val
-                                                }))
-                                            }}
-                                            placeholder="Enter emailId"
-                                        />
-                                    </View>
 
-                                    <View style={Styles.nameWrapper}>
-                                        <Text>Password</Text>
-                                        <TextInput
-                                            secureTextEntry
-                                            style={Styles.nameInput}
-                                            value={details.password}
-                                            onChangeText={(val) => {
-                                                setDetails(prevState => ({
-                                                    ...prevState,
-                                                    password: val
-                                                }))
-                                            }}
-                                            placeholder="Enter password"
-                                        />
-                                    </View>
+                            <View style={Styles.nameWrapper}>
+                                <Text>Email address</Text>
+                                <TextInput
+                                    style={Styles.nameInput}
+                                    value={details.emailId}
+                                    onChangeText={(val) => {
+                                        setDetails(prevState => ({
+                                            ...prevState,
+                                            emailId: val
+                                        }))
+                                    }}
+                                    placeholder="Enter emailId"
+                                />
+                            </View>
 
-                                    <Pressable onPress={onOpen} style={Styles.createBtn}>
-                                        <Text style={Styles.accountText}>Registration</Text>
-                                    </Pressable>
-
-                                </View>
-                            </Actionsheet.Content>
-                        </Actionsheet>
-                    ) : (
-                        <></>
-                    )
-                }
-                <Pressable onPress={() => useDisclose()} style={Styles.loginBtn}>
+                            <View style={Styles.nameWrapper}>
+                                <Text>Password</Text>
+                                <TextInput
+                                    secureTextEntry
+                                    style={Styles.nameInput}
+                                    value={details.password}
+                                    onChangeText={(val) => {
+                                        setDetails(prevState => ({
+                                            ...prevState,
+                                            password: val
+                                        }))
+                                    }}
+                                    placeholder="Enter password"
+                                />
+                            </View>
+                            {
+                                !currentActive ?
+                                    (<Pressable onPress={() => {navigation.navigate('forgotPassword', { emailId: details.emailId }), setModalVisible(false)}}>
+                                        <Text style={Styles.forgotPassword}>Forget Password?</Text>
+                                    </Pressable>) :
+                                    (<></>)
+                            }
+                            <Pressable disabled={currentActive ?!formStatus : (details.emailId.length && details.password.length ? false : true)} onPress={() => {setModalVisible(false), navigation.navigate('success')}}
+                             style={[Styles.createBtn, (currentActive ?!formStatus : (details.emailId.length && details.password.length ? false : true)) && { opacity: 0.3 }]}>
+                                <Text style={Styles.accountText}>{currentActive ? 'Registration' : 'Login'}</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </Modal>
+                <Pressable onPress={() => {setCurrentActive(false), setModalVisible(true)}} style={Styles.loginBtn}>
                     <Text style={Styles.accountText}>Login</Text>
                 </Pressable>
                 <View style={Styles.tAndC}>

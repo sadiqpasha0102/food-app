@@ -1,5 +1,4 @@
 import { Dimensions, StyleSheet } from "react-native";
-import { Directions } from "react-native-gesture-handler";
 
 
 
@@ -11,7 +10,7 @@ export const registrationPageStyles = StyleSheet.create({
     parent: {
         padding: 10,
         width: '100%',
-        height: '100%'
+        height: '100%',
     },
 
     imgWrapper: {
@@ -107,5 +106,26 @@ export const registrationPageStyles = StyleSheet.create({
         height: 40,
         padding: 10,
         borderRadius: 12
-    }
+    },
+
+    forgotPassword: {
+        textAlign:'right',
+        marginRight: 25,
+        paddingTop: 5,
+        color: '#32B768'
+    },
+
+    container: {
+        height: '100%',
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
+
+    modalBottom: {
+        paddingTop: 25,
+        borderTopRightRadius: 30,
+        borderTopLeftRadius: 30,
+        backgroundColor: '#FFFFFF',
+      }
+
 })
